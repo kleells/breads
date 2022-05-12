@@ -5,9 +5,10 @@ const breads = express.Router()
 
 // INDEX
 breads.get('/', (req, res) => {
-  res.render('index',
+  res.render('Index',
     {
-      breads: bread
+      breads: bread,
+      title: 'Index Page'
     }
   )
 // res.send(Bread)
