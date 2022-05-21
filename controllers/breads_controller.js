@@ -65,9 +65,11 @@ breads.get('/data/seed', (req, res) => {
 breads.get('/:id', (req, res) => {
   bread.findById(req.params.id)
       .then(foundBread => {
-          res.render('show', {
-              bread: foundBread
-          })
+        const bakedBy = foundBread.getBakedBy()
+        console.log(bakedBy)
+        res.render('show', {
+            bread: foundBread
+        })
       })
       .catch(err => {
         res.send('404')
