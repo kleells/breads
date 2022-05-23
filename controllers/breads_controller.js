@@ -1,40 +1,28 @@
-const express = require('express')
-const { findOneAndUpdate } = require('../models/bread')
-const bread = require('../models/bread')
-const breads = express.Router()
+const express = require('express');
+const breads = express.Router();
+const Bread = require('../models/bread.js');
+const Baker = require('../models/baker.js');
 
-// INDEX
+// INDEX OF BREADS
 breads.get('/', (req, res) => {
-  bread.find()
-      .then(foundBreads => {
-          res.render('index', {
-              breads: foundBreads,
-              title: 'Index Page'
-          })
+  Baker.find()
+      .then(foundBakers => {
+          Bread.find()
+              .then(foundBreads => {
+                  res.render('Index', 
+                      {
+                          breads: foundBreads,
+                          bakers: foundBakers,
+                          title: 'Index Page',
+                      }
+                  )
+              })
       })
-})
+});
 
-// CREATE
-breads.post('/', (req, res) => {
-  if (!req.body.image) {
-    req.body.image = undefined
-  }
-  if(req.body.hasGluten === 'on') {
-    req.body.hasGluten = true
-  } else {
-    req.body.hasGluten = false
-  }
-  bread.create(req.body)
-  res.redirect('/breads')
-})
-
-// NEW
-breads.get('/new', (req, res) => {
-  res.render('New')
-})
-
+// GET seeder data
 breads.get('/data/seed', (req, res) => {
-  bread.insertMany([
+  Bread.insertMany([
     {
       name: 'Rye',
       hasGluten: true,
@@ -59,54 +47,94 @@ breads.get('/data/seed', (req, res) => {
     .then(createdBreads => {
       res.redirect('/breads')
     })
-})
+    .catch(err => {
+      res.render('404')
+  })
+});
 
-// SHOW
-breads.get('/:id', (req, res) => {
-  bread.findById(req.params.id)
-      .then(foundBread => {
-        const bakedBy = foundBread.getBakedBy()
-        console.log(bakedBy)
-        res.render('show', {
-            bread: foundBread
-        })
+// NEW
+breads.get('/new', (req, res) => {
+  Baker.find()
+    .then(foundBakers => {
+      res.render('new', {
+        bakers: foundBakers
+      })
+    })
+});
+
+// POST new bread
+breads.post('/', (req, res) => {
+  if (!req.body.image) {
+      req.body.image = undefined
+    }
+  if(req.body.hasGluten === 'on'){
+      req.body.hasGluten = true
+  }
+  else{
+      req.body.hasGluten = false
+  }
+  Bread.create(req.body)
+      .then(newBread => {
+          res.redirect('/breads');
       })
       .catch(err => {
-        res.send('404')
+          res.render('404')
       })
-})
+});
+
+// EDIT
+breads.get('/:indexArray/edit', (req, res) => {
+  Baker.find()
+    .then(foundBakers => {
+        Bread.findById(req.params.indexArray)
+          .then(foundBread => {
+            res.render('edit', {
+                bread: foundBread, 
+                bakers: foundBakers 
+            })
+          })
+    })
+});
+
+// SHOW
+breads.get('/:arrayIndex', (req, res) => {
+  Bread.findById(req.params.arrayIndex)
+        .populate('baker')
+        .then(foundBread => {
+            const bakedBy = foundBread.getBakedBy()
+            console.log(bakedBy)
+            res.render('Show', {
+                bread: foundBread,
+            })
+        })
+        .catch(err => {
+            console.log(err, "error")
+            res.render('404')
+        })
+});
 
 // DELETE
-breads.delete('/:id', (req, res) => {
-  bread.findByIdAndDelete(req.params.id) 
+breads.delete('/:arrayIndex', (req, res) => {
+  Bread.findByIdAndDelete(req.params.id) 
     .then(deletedBread => { 
       res.status(303).redirect('/breads')
     })
 })
 
 // UPDATE
-//breads.put('/:id, (req, res) = > {
-breads.put('/:id', (req, res) => {
+breads.put('/:arrayIndex', (req, res) => {
   if(req.body.hasGluten === 'on'){
     req.body.hasGluten = true
   } else {
     req.body.hasGluten = false
   }
-  bread.findByIdAndUpdate(req.params.id, req.body, {new: true})
+  Bread.findByIdAndUpdate(req.params.arrayIndex, req.body, {runValidators: true})
     .then(updatedBread => {
-      console.log(updatedBread)
-      res.redirect(`/breads/${req.params.id}`)
-    })
-})
-
-// EDIT
-breads.get('/:id/edit', (req, res) => {
-  bread.findById(req.params.id) 
-    .then(foundBread => { 
-      res.render('edit', {
-        bread: foundBread 
-      })
-    })
+      res.redirect(`/breads/${req.params.arrayIndex}`)
+        })
+        .catch(err => {
+            res.render('404')
+        })
 })
 
 module.exports = breads
