@@ -25,7 +25,6 @@ function Show ({bread, index}) {
         </form>
         <a href='/breads'><button className='btn-primary'>Go home</button></a>
       </Default>
-      
     )
 }
 

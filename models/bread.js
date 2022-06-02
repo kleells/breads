@@ -1,22 +1,26 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose
-
-// bread schema
+//import mongoose
+const mongoose = require("mongoose");
+//append schema to mongoose
+const { Schema } = mongoose;
+  
+//build bread schema
 const breadSchema = new Schema({
-  name: { type: String, required: true },
+  //require field
+  name: {type: String, required: true},
   hasGluten: Boolean,
-  image: { type: String, default: 'https://unsplash.com/photos/rsWZ-P9FbQ4' },
+  image: {type: String, default: 'http://placehold.it/500x500.png'},
   baker: {
     type: Schema.Types.ObjectID,
-    ref: 'Baker'
+    ref: 'Baker',
   }
-});
+})
 
-// helper methods 
+//helper methods
 breadSchema.methods.getBakedBy = function(){
   return `${this.name} was baked with love by ${this.baker.name}, who has been with us since ${this.baker.startDate.getFullYear()}`
-};
+}
+//create model to house schema and interact with mongoDB
+const Bread = mongoose.model('Bread', breadSchema);
 
-const Bread = mongoose.model('Bread', breadSchema)
-
+//export model not schema
 module.exports = Bread;

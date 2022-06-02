@@ -24,10 +24,10 @@ function Index ({breads, bakers, title}) {
             <h3>Breads</h3>
             <ul>
               {
-                breads.map((bread, index)=> {
+                breads.map((breads, index)=> {
                   return (
-                  <li key={bread_id}>
-                    <a href={`/breads/${breads.id_id}`}>
+                  <li key={breads._id}>
+                    <a href={`/breads/${breads._id}`}>
                       {breads.name}
                     </a>
                   </li>

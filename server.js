@@ -1,13 +1,13 @@
-// DEPENDENCIES AND CONFIGURATION
-require('dotenv').config()
-const express = require('express')
-const app = express()
-const methodOverride = require('method-override')
-const mongoose = require('mongoose')
-const PORT = process.env.PORT
+//Configuration of dotenv, express and .env
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const methodOverride = require('method-override');
+const mongoose = require('mongoose');
+const PORT = process.env.PORT;
+const mongooseURI = process.env.MONGO_URI;
 
-
-// MIDDLEWARE
+//MIDDLEWARE
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jsx');
 app.engine('jsx', require('express-react-views').createEngine());
@@ -15,30 +15,30 @@ app.use(express.static('public'));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 
-//MongoDB Integration
-mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true}, 
-  () => { console.log('connected to mongo: ', process.env.MONGO_URI) }
+//MongoDB DATABASE
+mongoose.connect(mongooseURI, {useNewUrlParser: true, useUnifiedTopology: true}, 
+    () => {console.log('connected to mongo: ', mongooseURI)}
 )
 
-// ROUTES
+//route
 app.get('/', (req, res) => {
-  res.send('Welcome to an Awesome App about Breads!')
+    res.send('Welcome to an awesome app about Breads!')
 })
 
-// Breads 
-const breadsController = require('./controllers/breads_controller.js')
-app.use('/breads', breadsController)
+//breads
+const breadController = require('./controllers/breads_controller.js')
+app.use('/breads', breadController)
 
-// bakers
+//bakers
 const bakersController = require('./controllers/bakers_controller.js')
 app.use('/bakers', bakersController)
 
-// 404 Page
+//404 page
 app.get('*', (req, res) => {
-  res.send('404')
+        res.send('404')
 })
 
-// LISTEN
+//listen for port number
 app.listen(PORT, () => {
-  console.log('nomming at port', PORT);
-})
+    console.log('nomming at port', PORT);
+});
